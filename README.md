@@ -44,3 +44,39 @@ login-anomaly-fraud-detector/
 │   └── sample_logins.csv       # Fake login data
 └── src/
     └── detect_fraud.py         # Main fraud detection script
+
+
+Make sure you see the big `# Login Anomaly Fraud Detector 🛡️` at the top in the editor.
+
+---
+
+## 🪜 STEP 5 – Save your changes (Commit)
+
+1. Scroll **down to the bottom** of the page.
+2. In the **“Commit changes”** section:
+   - In the small **Commit message** box, type:
+     ```text
+     Fix README formatting and structure
+     ```
+   - Leave everything else as-is (Commit directly to the `main` branch).
+3. Click the green button:
+
+   > **Commit changes**
+
+---
+
+## 🪜 STEP 6 – Check how it looks
+
+1. GitHub will take you back to the main repo page.
+2. Scroll down under the file list.
+3. You should now see:
+   - Big bold title  
+   - Nicely formatted sections  
+   - Bullets and headings  
+
+If you see that, you’re done ✅
+
+---
+
+If you want, paste a screenshot of how your README looks now, and I’ll tell you exactly how I’d talk about this repo to a recruiter.
+::contentReference[oaicite:0]{index=0}

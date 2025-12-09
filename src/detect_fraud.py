@@ -12,6 +12,9 @@ MAX_FAILED_ATTEMPTS = 3
 UNUSUAL_HOUR_START = 2   # 2 AM
 UNUSUAL_HOUR_END = 4     # 4 AM
 
+# "Impossible travel" threshold in hours
+IMPOSSIBLE_TRAVEL_HOURS = 4
+
 
 def parse_timestamp(ts_str):
     """
@@ -55,6 +58,9 @@ def detect_anomalies(events):
     # Track last known country per user
     last_country_by_user = {}
 
+    # Track last login time per user
+    last_timestamp_by_user = {}
+
     # Track consecutive failures per user
     consecutive_failures_by_user = {}
 
@@ -83,18 +89,37 @@ def detect_anomalies(events):
                 f"{consecutive_failures_by_user[user]} failed logins in a row"
             )
 
-        # 2) Check for new country
+        # 2) Check for new country and impossible travel
         previous_country = last_country_by_user.get(user)
+        previous_time = last_timestamp_by_user.get(user)
+
         if previous_country is None:
-            # first ever country we see for this user
+            # First time we've ever seen this user
             last_country_by_user[user] = country
+            last_timestamp_by_user[user] = dt
         else:
             if country != previous_country:
+                # New country is always interesting
                 reasons.append(
                     f"New country for this user: {country} (previous: {previous_country})"
                 )
-                # update last seen country
+
+                # Check for impossible travel based on time difference
+                if previous_time is not None:
+                    time_diff = dt - previous_time
+                    hours = time_diff.total_seconds() / 3600.0
+
+                    if hours < IMPOSSIBLE_TRAVEL_HOURS:
+                        reasons.append(
+                            f"Possible impossible travel: {previous_country} -> {country} in {hours:.2f} hours"
+                        )
+
+                # Update to latest country and time
                 last_country_by_user[user] = country
+                last_timestamp_by_user[user] = dt
+            else:
+                # Same country, just update last time seen
+                last_timestamp_by_user[user] = dt
 
         # 3) Check unusual login hours
         if is_unusual_hour(dt):
@@ -138,6 +163,7 @@ def print_report(suspicious_events):
 
 
 def main():
+    # Path to the CSV file (relative to project root)
     csv_path = "data/sample_logins.csv"
 
     print(f"Loading login events from {csv_path} ...")
